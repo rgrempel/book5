@@ -1,0 +1,3 @@
+[submodule "public/javascripts/isomorphic"]
+	path = public/javascripts/isomorphic
+	url = git://github.com/rgrempel/isomorphic.git
