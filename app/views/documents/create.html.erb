@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <script>
+      <%= @callback.html_safe %>( <%= {
+        :response => {
+          :status => @status,
+          :errors => @record.errors,
+          :data => [
+            @record
+          ]
+        }
+      }.to_json.html_safe %>)
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
+

@@ -10,6 +10,7 @@ gem 'haml-rails'
 gem 'silent-postgres'
 gem 'nokogiri'
 gem 'smartclient_rails', :git => 'git://github.com/rgrempel/smartclient_rails.git'
+gem 'paperclip'
 
 group :development do
   gem 'annotate'
