@@ -1,5 +1,6 @@
 Book5::Application.routes.draw do
   resources :documents
+  resources :pages
 
   root :to => "documents#index"
   

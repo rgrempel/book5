@@ -26,13 +26,24 @@ isc.RailsDataSource.create({
   ]
 });
 
+isc.RailsDataSource.create({
+  ID: "page",
+  dataURL: "pages",
+  fields: [
+    {name: "dzi_url", type: "text"},
+    {name: "thumbnail_url", type: "image"},
+    {name: "id", type: "text", primaryKey: true},
+    {name: "isc_row", type: "integer"}
+  ]
+});
+
 isc.defineClass("UploadDocumentForm", isc.FileUploadForm).addProperties({
   action: "/documents",
   method: "post",
   errorOrientation: "top",
   showErrorText: true,
   dataSource: "document",
-  wrapItemTitles: false,
+  wrapItemTitles: true,
   fields: [
     {name: "tag", title: "Tag to identify this document", required: true},
     {name: "tei", type: "upload", title: "File to Upload", required: true},
@@ -65,9 +76,6 @@ isc.defineClass("DocumentGrid", isc.ListGrid).addProperties({
 });
 
 isc.defineClass("DocumentLayout", isc.VLayout).addProperties({
-  width: "25%",
-  height: "100%",
-
   documentGridDefaults: {
     _constructor: isc.DocumentGrid
   },
@@ -109,12 +117,151 @@ isc.defineClass("DocumentContents", isc.VLayout).addProperties({
   }
 });
 
-isc.defineClass("AppLayout", isc.HLayout).addProperties({
-  width: "100%",
-  height: "100%",
+isc.defineClass("PageGrid", isc.ListGrid).addClassProperties({
+  thumbWidth: 70,
+  thumbHeight: 100
+}).addProperties({
+  dataSource: "page",
+  autoFetchData: true,
+  selectionType: "single",
+  showHeader: false,
+  cellHeight: isc.PageGrid.thumbHeight,
+  width: isc.PageGrid.thumbWidth + 25,
+  handlingPageChange: false,
 
+  fields: [{
+      name: "thumbnail_url",
+      cellAlign: "center",
+      imageHeight: isc.PageGrid.thumbHeight,
+      imageWidth: isc.PageGrid.thumbWidth,
+      width: isc.PageGrid.thumbWidth
+  }],
+
+  initWidget : function() {
+    this.Super("initWidget", arguments);
+    this.viewableBox = isc.Canvas.create({
+      border: "2px dashed yellow"
+    });
+  },
+
+  draw : function() {
+    this.Super("draw", arguments);
+    if (this.pageOnDraw) {
+      // TODO: This is probably not the right way to do this ...
+      this.delayCall("handleScrollToPage", [this.pageOnDraw], 1000);
+      this.pageOnDraw = null;
+    }
+  },
+
+  setPercentRect : function (percentRect) {
+    var thumbWidth = this.getClass().thumbWidth;
+    var thumbHeight = this.getClass().thumbHeight;
+    var scale = Math.max(thumbWidth, thumbHeight);
+
+    var box = [
+      percentRect.x * scale,
+      percentRect.y * scale,
+      percentRect.width * scale,
+      percentRect.height * scale
+    ]
+
+    if (box[0] + box[2] > thumbWidth) box[2] = thumbWidth - box[0];
+    if (box[1] + box[3] > thumbHeight) box[3] = thumbHeight - box[1];
+    if (box[0] < 0) {
+      box[2] = box[2] + box[0];
+      box[0] = 0;
+    }
+    if (box[1] < 0) {
+      box[3] = box[3] + box[1];
+      box[1] = 0;
+    }
+    
+    box[1] = box[1] + this.viewableBox.topOffset;
+    
+    this.viewableBox.setRect(box);
+  },
+
+  selectionChanged : function (record, state) {
+    if (state) {
+      if (!this.handlingPageChange) this.fireScrollToPage(record);
+    }
+  },
+
+  fireScrollToPage: function (page) {
+    return page;
+  },
+
+  handleScrollToPage: function (page) {
+    if (this.handlingPageChange) return;
+    if (!this.isDrawn()) {
+      this.pageOnDraw = page;
+      return;
+    }
+
+    var visible = this.getVisibleRows();
+    if (visible[0] < 0) return;
+
+    // check if page is  visible
+    var pageIsVisible = false;
+    for (var x = visible[0]; x <= visible[1]; x++) {
+      if (this.getRecord(x).id == page.id) {
+        pageIsVisible = true;
+        break;
+      }
+    }
+    
+    if (!pageIsVisible) {
+      this.body.scrollToRatio(true, page.isc_row / this.getTotalRows());
+    }
+    
+    this.handlingPageChange = true;
+    this.selectSingleRecord(page.isc_row);
+    this.handlingPageChange = false;
+      
+    this.addEmbeddedComponent(this.viewableBox, page, page.isc_row, 0, "within");
+    this.viewableBox.topOffset = page.sc_row * this.getClass().thumbHeight;
+  }  
+});
+
+isc.defineClass("DeepZoomLayout", isc.HLayout).addProperties({
+  imageDefaults: {
+    _constructor: isc.SeaDragon,
+    width: "100%",
+    height: "100%"
+  },
+
+  sliderDefaults: {
+    _constructor: isc.PageGrid,
+    height: "100%"
+  },
+
+  initWidget : function () {
+    this.Super("initWidget");
+
+    this.addAutoChild("image");
+    this.addAutoChild("slider");
+
+    this.observe(this.image, "fireVisible", "observer.handleImageScrolled(returnVal)");
+    this.observe(this.slider, "fireScrollToPage", "observer.handleScrollToPage(returnVal)");
+  },
+
+  handleImageScrolled: function (bounds) {
+    this.slider.setPercentRect(bounds);
+  },
+
+  handleScrollToPage: function (page) {
+    this.slider.handleScrollToPage(page);
+    if (page && (this.image.dzi_url != page.dzi_url)) {
+      this.image.setDZIURL(page.dzi_url);
+    }
+  }
+});
+
+isc.defineClass("AppLayout", isc.HLayout).addProperties({
   documentLayoutDefaults: {
-    _constructor: isc.DocumentLayout
+    _constructor: isc.DocumentLayout,
+    width: "20%",
+    height: "100%"
   },
 
   documentContentsDefaults: {
@@ -123,10 +270,17 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
     height: "100%"
   },
 
+  deepZoomDefaults: {
+    _constructor: isc.DeepZoomLayout,
+    width: "45%",
+    height: "100%"
+  },
+
   initWidget : function () {
     this.Super("initWidget");
     this.addAutoChild("documentLayout");
     this.addAutoChild("documentContents");
+    this.addAutoChild("deepZoom");
   },
 
   setDocument : function (doc) {
@@ -135,6 +289,9 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
 });
 
 isc.Page.setEvent("load", function() {
-  book5 = isc.AppLayout.create();
+  book5 = isc.AppLayout.create({
+    width: "100%",
+    height: "100%"
+  });
   book5.draw();
 }, isc.Page.FIRE_ONCE);
