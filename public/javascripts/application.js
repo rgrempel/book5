@@ -43,6 +43,8 @@ isc.defineClass("UploadDocumentForm", isc.FileUploadForm).addProperties({
   errorOrientation: "top",
   showErrorText: true,
   dataSource: "document",
+  titleOrientation: "top",
+  numCols: 1,
   wrapItemTitles: true,
   fields: [
     {name: "tag", title: "Tag to identify this document", required: true},
@@ -51,7 +53,6 @@ isc.defineClass("UploadDocumentForm", isc.FileUploadForm).addProperties({
       name: "submit",
       type: "button",
       align: "center",
-      colSpan: 2,
       click : function (form, item) {
         form.saveFileData({target: form, methodName: "handleReply"});
       }
@@ -118,15 +119,17 @@ isc.defineClass("DocumentContents", isc.VLayout).addProperties({
 });
 
 isc.defineClass("PageGrid", isc.ListGrid).addClassProperties({
-  thumbWidth: 70,
-  thumbHeight: 100
+  thumbWidth: 84,
+  thumbHeight: 120
 }).addProperties({
   dataSource: "page",
   autoFetchData: true,
   selectionType: "single",
   showHeader: false,
   cellHeight: isc.PageGrid.thumbHeight,
-  width: isc.PageGrid.thumbWidth + 25,
+  fixedRecordHeights: true,
+  enforceVClipping: true,
+  width: isc.PageGrid.thumbWidth + 20,
   handlingPageChange: false,
 
   fields: [{
@@ -219,8 +222,8 @@ isc.defineClass("PageGrid", isc.ListGrid).addClassProperties({
     this.handlingPageChange = false;
       
     this.addEmbeddedComponent(this.viewableBox, page, page.isc_row, 0, "within");
-    this.viewableBox.topOffset = page.sc_row * this.getClass().thumbHeight;
-  }  
+    this.viewableBox.topOffset = page.sc_row * (this.getClass().thumbHeight);
+  }
 });
 
 isc.defineClass("DeepZoomLayout", isc.HLayout).addProperties({
@@ -260,19 +263,21 @@ isc.defineClass("DeepZoomLayout", isc.HLayout).addProperties({
 isc.defineClass("AppLayout", isc.HLayout).addProperties({
   documentLayoutDefaults: {
     _constructor: isc.DocumentLayout,
-    width: "20%",
+    showResizeBar: true,
+    defaultWidth: "20%",
     height: "100%"
   },
 
   documentContentsDefaults: {
     _constructor: isc.DocumentContents,
-    width: "35%",
+    showResizeBar: true,
+    defaultWidth: "35%",
     height: "100%"
   },
 
   deepZoomDefaults: {
     _constructor: isc.DeepZoomLayout,
-    width: "45%",
+    defaultWidth: "45%",
     height: "100%"
   },
 
