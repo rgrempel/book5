@@ -95,7 +95,6 @@ isc.defineClass("DocumentLayout", isc.VLayout).addProperties({
 isc.defineClass("DocumentContents", isc.VLayout).addProperties({
   documentFlowDefaults: {
     _constructor: isc.HTMLPane,
-    backgroundColor: "#EEEEEE",
     width: "100%",
     height: "100%"
   },
