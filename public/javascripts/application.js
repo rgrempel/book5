@@ -127,7 +127,6 @@ isc.defineClass("PageGrid", isc.ListGrid).addClassProperties({
   showHeader: false,
   cellHeight: isc.PageGrid.thumbHeight,
   fixedRecordHeights: true,
-  enforceVClipping: true,
   width: isc.PageGrid.thumbWidth + 20,
   handlingPageChange: false,
 
