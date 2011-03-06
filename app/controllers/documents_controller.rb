@@ -1,5 +1,5 @@
 class DocumentsController < ApplicationController
-  respond_to :html, :isc, :tei
+  respond_to :html, :isc, :tei, :teihtml
 
   # This one is special because we're using XJSON and uploads
   def create
@@ -24,6 +24,9 @@ class DocumentsController < ApplicationController
         end
         format.html do
           @contents = File.open(@document.tei.path) {|file| file.read}
+        end
+        format.teihtml do
+          @xmldoc = @document.parse_xml
         end
       end
     end

@@ -109,7 +109,7 @@ isc.defineClass("DocumentContents", isc.VLayout).addProperties({
   documentDownloadDefaults: {
     _constructor: isc.HTMLPane,
     width: "100%",
-    height: 40
+    height: 20
   },
 
   initWidget : function () {
@@ -121,6 +121,12 @@ isc.defineClass("DocumentContents", isc.VLayout).addProperties({
   setDocument : function (doc) {
     this.documentFlow.setContentsURL("/documents/" + doc.id + ".html");
     this.documentDownload.setContents('<a href="/documents/' + doc.id  + '.tei" target="_window">Download TEI file</a>'); 
+  }
+});
+
+isc.defineClass("DocumentStyled", isc.HTMLPane).addProperties({
+  setDocument : function (doc) {
+    this.setContentsURL("/documents/" + doc.id + ".teihtml");
   }
 });
 
@@ -288,9 +294,28 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
 
   documentContentsDefaults: {
     _constructor: isc.DocumentContents,
+    height: "100%",
+    width: "100%"
+  },
+
+  styledTEIDefaults: {
+    _constructor: isc.DocumentStyled,
+    height: "100%",
+    width: "100%"
+  },
+
+  documentTabsDefaults: {
+    _constructor: isc.TabSet,
     showResizeBar: true,
     defaultWidth: "35%",
-    height: "100%"
+    height: "100%",
+    tabs: [{
+      title: "Raw TEI",
+      pane: "autoChild:documentContents"
+    },{
+      title: "Styled TEI",
+      pane: "autoChild:styledTEI"
+    }]
   },
 
   deepZoomDefaults: {
@@ -302,12 +327,13 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
   initWidget : function () {
     this.Super("initWidget");
     this.addAutoChild("documentLayout");
-    this.addAutoChild("documentContents");
+    this.addAutoChild("documentTabs");
     this.addAutoChild("deepZoom");
   },
 
   setDocument : function (doc) {
     this.documentContents.setDocument(doc);
+    this.styledTEI.setDocument(doc);
     this.deepZoom.setDocument(doc);
   }
 });
