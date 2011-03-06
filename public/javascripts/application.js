@@ -27,12 +27,15 @@ isc.RailsDataSource.create({
 });
 
 isc.RailsDataSource.create({
-  ID: "page",
-  dataURL: "pages",
+  ID: "surface",
+  dataURL: "/surfaces",
+  recordXPath: "/default:response/default:data/*",
   fields: [
     {name: "dzi_url", type: "text"},
     {name: "thumbnail_url", type: "image"},
+    {name: "original_url", type: "text"},
     {name: "id", type: "text", primaryKey: true},
+    {name: "n", type: "text"},
     {name: "isc_row", type: "integer"}
   ]
 });
@@ -58,6 +61,7 @@ isc.defineClass("UploadDocumentForm", isc.FileUploadForm).addProperties({
       }
     }
   ],
+
   handleReply : function (dsResponse, data, dsRequest) {
     if (dsResponse.status == 0) {
       book5.setDocument(data);
@@ -117,25 +121,26 @@ isc.defineClass("DocumentContents", isc.VLayout).addProperties({
   }
 });
 
-isc.defineClass("PageGrid", isc.ListGrid).addClassProperties({
+isc.defineClass("SurfaceGrid", isc.ListGrid).addClassProperties({
   thumbWidth: 84,
   thumbHeight: 120
 }).addProperties({
-  dataSource: "page",
-  autoFetchData: true,
+  dataSource: "surface",
+  autoFetchData: false,
   selectionType: "single",
   showHeader: false,
-  cellHeight: isc.PageGrid.thumbHeight,
+  cellHeight: isc.SurfaceGrid.thumbHeight,
   fixedRecordHeights: true,
-  width: isc.PageGrid.thumbWidth + 20,
-  handlingPageChange: false,
+  width: isc.SurfaceGrid.thumbWidth + 20,
+  handlingSurfaceChange: false,
+  surfaceOnDraw: null, // A surface to scroll to once we're drawn
 
   fields: [{
       name: "thumbnail_url",
       cellAlign: "center",
-      imageHeight: isc.PageGrid.thumbHeight,
-      imageWidth: isc.PageGrid.thumbWidth,
-      width: isc.PageGrid.thumbWidth
+      imageHeight: isc.SurfaceGrid.thumbHeight,
+      imageWidth: isc.SurfaceGrid.thumbWidth,
+      width: isc.SurfaceGrid.thumbWidth
   }],
 
   initWidget : function() {
@@ -147,11 +152,15 @@ isc.defineClass("PageGrid", isc.ListGrid).addClassProperties({
 
   draw : function() {
     this.Super("draw", arguments);
-    if (this.pageOnDraw) {
+    if (this.surfaceOnDraw) {
       // TODO: This is probably not the right way to do this ...
-      this.delayCall("handleScrollToPage", [this.pageOnDraw], 1000);
-      this.pageOnDraw = null;
+      this.delayCall("handleScrollToSurface", [this.surfaceOnDraw], 1000);
+      this.surfaceOnDraw = null;
     }
+  },
+
+  setDocument : function (doc) {
+    this.fetchData({document_id: doc.id});
   },
 
   setPercentRect : function (percentRect) {
@@ -178,49 +187,48 @@ isc.defineClass("PageGrid", isc.ListGrid).addClassProperties({
     }
     
     box[1] = box[1] + this.viewableBox.topOffset;
-    
     this.viewableBox.setRect(box);
   },
 
   selectionChanged : function (record, state) {
     if (state) {
-      if (!this.handlingPageChange) this.fireScrollToPage(record);
+      if (!this.handlingSurfaceChange) this.fireScrollToSurface(record);
     }
   },
 
-  fireScrollToPage: function (page) {
-    return page;
+  fireScrollToSurface : function (surface) {
+    return surface;
   },
 
-  handleScrollToPage: function (page) {
-    if (this.handlingPageChange) return;
+  handleScrollToSurface : function (surface) {
+    if (this.handlingSurfaceChange) return;
     if (!this.isDrawn()) {
-      this.pageOnDraw = page;
+      this.surfaceOnDraw = surface;
       return;
     }
 
     var visible = this.getVisibleRows();
     if (visible[0] < 0) return;
 
-    // check if page is  visible
-    var pageIsVisible = false;
+    // check if surface is  visible
+    var surfaceIsVisible = false;
     for (var x = visible[0]; x <= visible[1]; x++) {
-      if (this.getRecord(x).id == page.id) {
-        pageIsVisible = true;
+      if (this.getRecord(x).id == surface.id) {
+        surfaceIsVisible = true;
         break;
       }
     }
     
-    if (!pageIsVisible) {
-      this.body.scrollToRatio(true, page.isc_row / this.getTotalRows());
+    if (!surfaceIsVisible) {
+      this.body.scrollToRatio(true, surface.isc_row / this.getTotalRows());
     }
     
-    this.handlingPageChange = true;
-    this.selectSingleRecord(page.isc_row);
-    this.handlingPageChange = false;
+    this.handlingSurfaceChange = true;
+    this.selectSingleRecord(surface.isc_row);
+    this.handlingSurfaceChange = false;
       
-    this.addEmbeddedComponent(this.viewableBox, page, page.isc_row, 0, "within");
-    this.viewableBox.topOffset = page.sc_row * (this.getClass().thumbHeight);
+    this.addEmbeddedComponent(this.viewableBox, surface, surface.isc_row, 0, "within");
+    this.viewableBox.topOffset = surface.isc_row * (this.getClass().thumbHeight);
   }
 });
 
@@ -232,8 +240,12 @@ isc.defineClass("DeepZoomLayout", isc.HLayout).addProperties({
   },
 
   sliderDefaults: {
-    _constructor: isc.PageGrid,
+    _constructor: isc.SurfaceGrid,
     height: "100%"
+  },
+
+  setDocument : function (doc) {
+    this.slider.setDocument (doc);
   },
 
   initWidget : function () {
@@ -243,17 +255,17 @@ isc.defineClass("DeepZoomLayout", isc.HLayout).addProperties({
     this.addAutoChild("slider");
 
     this.observe(this.image, "fireVisible", "observer.handleImageScrolled(returnVal)");
-    this.observe(this.slider, "fireScrollToPage", "observer.handleScrollToPage(returnVal)");
+    this.observe(this.slider, "fireScrollToSurface", "observer.handleScrollToSurface(returnVal)");
   },
 
-  handleImageScrolled: function (bounds) {
+  handleImageScrolled : function (bounds) {
     this.slider.setPercentRect(bounds);
   },
 
-  handleScrollToPage: function (page) {
-    this.slider.handleScrollToPage(page);
-    if (page && (this.image.dzi_url != page.dzi_url)) {
-      this.image.setDZIURL(page.dzi_url);
+  handleScrollToSurface : function (surface) {
+    this.slider.handleScrollToSurface(surface);
+    if (surface && (this.image.dzi_url != surface.dzi_url)) {
+      this.image.setDZIURL(surface.dzi_url);
     }
   }
 });
@@ -288,6 +300,7 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
 
   setDocument : function (doc) {
     this.documentContents.setDocument(doc);
+    this.deepZoom.setDocument(doc);
   }
 });
 

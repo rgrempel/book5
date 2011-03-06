@@ -6,6 +6,9 @@ class Document < ActiveRecord::Base
                           :processors => [:TEI],
                           :whiny_thumbnails => true
 
+  def parse_xml
+    Nokogiri::XML.parse(File.read(self.tei.path))
+  end
 end
 
 module Paperclip
