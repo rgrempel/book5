@@ -135,7 +135,7 @@ isc.defineClass("SurfaceGrid", isc.ListGrid).addClassProperties({
   showHeader: false,
   cellHeight: isc.SurfaceGrid.thumbHeight,
   fixedRecordHeights: true,
-  width: isc.SurfaceGrid.thumbWidth + 44,
+  width: isc.SurfaceGrid.thumbWidth + 50,
   handlingSurfaceChange: false,
   surfaceOnDraw: null, // A surface to scroll to once we're drawn
 
@@ -148,7 +148,7 @@ isc.defineClass("SurfaceGrid", isc.ListGrid).addClassProperties({
   },{
       name: "n",
       cellAlign: "center",
-      width: 24
+      width: 30
   }],
 
   initWidget : function() {
