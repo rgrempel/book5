@@ -30,6 +30,9 @@ isc.RailsDataSource.create({
   ID: "surface",
   dataURL: "/surfaces",
   recordXPath: "/default:response/default:data/*",
+  totalRowsXPath: "/default:response/default:totalRows",
+  startRowXPath: "/default:response/default:startRow",
+  endRowXPath: "/default:response/default:endRow",
   fields: [
     {name: "dzi_url", type: "text"},
     {name: "thumbnail_url", type: "image"},
@@ -127,11 +130,12 @@ isc.defineClass("SurfaceGrid", isc.ListGrid).addClassProperties({
 }).addProperties({
   dataSource: "surface",
   autoFetchData: false,
+  showAllRecords: true, // for smoother scrolling
   selectionType: "single",
   showHeader: false,
   cellHeight: isc.SurfaceGrid.thumbHeight,
   fixedRecordHeights: true,
-  width: isc.SurfaceGrid.thumbWidth + 20,
+  width: isc.SurfaceGrid.thumbWidth + 44,
   handlingSurfaceChange: false,
   surfaceOnDraw: null, // A surface to scroll to once we're drawn
 
@@ -141,6 +145,10 @@ isc.defineClass("SurfaceGrid", isc.ListGrid).addClassProperties({
       imageHeight: isc.SurfaceGrid.thumbHeight,
       imageWidth: isc.SurfaceGrid.thumbWidth,
       width: isc.SurfaceGrid.thumbWidth
+  },{
+      name: "n",
+      cellAlign: "center",
+      width: 24
   }],
 
   initWidget : function() {
