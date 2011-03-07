@@ -1,13 +1,36 @@
 /* Modified for HTML divs, with classes representing the TEI tags */
 
 div.tagOpen, div.tagClose, div.tagOpenClose {
-    color: green;
+    color: #113311;
     font-size: 90%;
+    padding: 1px;
+    background-color: #EEFFEE;
+    border: 1px solid #668866;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -opera-border-radius: 8px;
+    -khtml-border-radius: 8px;
+    border-radius: 8px;
+    opacity: 0.8;
 }
 
 div.tagAttribute {
     display: inline;
     color: green;
+}
+
+div.facsimile:after {
+    content: "<surface> tags omitted ... download TEI document to see them";
+    color: blue;
+    display: block;
+}
+
+div.surface {
+    display: none;
+}
+
+div.graphic {
+    display: inline;
 }
 
 div.said {
@@ -147,6 +170,7 @@ div.body {
     display: block;
     counter-reset: div1;
     font-size: 125%;
+    line-height: 135%;
 }
 
 div.byline {
