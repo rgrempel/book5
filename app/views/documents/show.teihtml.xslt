@@ -20,7 +20,7 @@
             <xsl:apply-templates />
             <!-- If there are no children, we add some spurious stuff to avoid a browser bug -->
             <xsl:if test="count(* | text()) = 0">
-                <xsl:comment>Empty tag</xsl:comment>
+                <xsl:comment>Empty</xsl:comment>
             </xsl:if>
         </div>
     </xsl:template>
@@ -33,7 +33,16 @@
     <!-- Except for xml:id, which we do as id -->
     <xsl:template match="@xml:id">
         <xsl:attribute name="id">
-            <xsl:value-of select="."/>
+            <xsl:text>tei-plain-</xsl:text>
+            <xsl:value-of select="." />
+        </xsl:attribute>
+    </xsl:template>
+
+    <!-- And rend, which we duplicate as style -->
+    <xsl:template match="@rend">
+        <xsl:copy />
+        <xsl:attribute name="style">
+            <xsl:value-of select="." />
         </xsl:attribute>
     </xsl:template>
 </xsl:stylesheet>

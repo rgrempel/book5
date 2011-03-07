@@ -1,10 +1,40 @@
 /* Modified for HTML divs, with classes representing the TEI tags */
 
+div.tagOpen, div.tagClose, div.tagOpenClose {
+    display: inline;
+    color: green;
+    font-size: 90%;
+}
+
+div.tagAttribute {
+    display: inline;
+    color: green;
+}
+
 div.said {
     display: inline;
 }
 
+div.space {
+    display: inline;
+}
+
 div.w {
+    display: inline;
+}
+
+div.c {
+    display: inline;
+}
+
+div.w div.lb:before {
+    content: "/";
+    color: blue;
+    display: inline;
+    font-weight: bold;
+}
+
+div.w div.lb {
     display: inline;
 }
 
@@ -114,9 +144,10 @@ div.imprint > div.biblScope {
 
 div.body {
     margin-top: 5px;
-    margin-left: 10px;
+    margin-left: 3em;
     display: block;
     counter-reset: div1;
+    font-size: 125%;
 }
 
 div.byline {
@@ -764,15 +795,15 @@ div.p {
 }
 
 div.pb {
-    display: none;
+    display: block;
 }
 
 div.pb:after {
     content: attr(n);
-    font-weight: bold;
-    margin-bottom: 1em;
-    margin-top: 1em;
     text-align: center;
+    color: blue;
+    margin-left: -3em;
+    float: left;
 }
 
 div.principal {
@@ -1053,8 +1084,8 @@ div.unclear {
 
 div.teiHeader {
     display: block;
-    color: silver;
-    background-color: rgb(251, 242, 234);
+    color: black;
+    background-color: rgb(234, 234, 234);
     border: solid black 1pt;
     margin-bottom: 2em;
     padding-top: 1em;

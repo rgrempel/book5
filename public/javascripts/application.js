@@ -119,7 +119,7 @@ isc.defineClass("DocumentContents", isc.VLayout).addProperties({
   },
 
   setDocument : function (doc) {
-    this.documentFlow.setContentsURL("/documents/" + doc.id + ".html");
+    this.documentFlow.setContentsURL("/documents/" + doc.id + ".teisource");
     this.documentDownload.setContents('<a href="/documents/' + doc.id  + '.tei" target="_window">Download TEI file</a>'); 
   }
 });
@@ -310,10 +310,10 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
     defaultWidth: "35%",
     height: "100%",
     tabs: [{
-      title: "Raw TEI",
+      title: "TEI",
       pane: "autoChild:documentContents"
     },{
-      title: "Styled TEI",
+      title: "Text",
       pane: "autoChild:styledTEI"
     }]
   },
