@@ -108,6 +108,25 @@ isc.defineClass("DocumentContents", isc.VLayout).addProperties({
 
   documentDownloadDefaults: {
     _constructor: isc.HTMLPane,
+    width: "50%",
+    height: "100%",
+    autoParent: "lowerPane"
+  },
+
+  showTagsButtonDefaults: {
+    _constructor: isc.Button,
+    autoFit: true,
+    actionType: "checkbox",
+    title: "Show Tags",
+    autoParent: "lowerPane",
+    action : function () {
+      book5.showTags(this.isSelected());
+      this.setTitle(this.isSelected() ? "Hide Tags" : "Show Tags");
+    }
+  },
+
+  lowerPaneDefaults: {
+    _constructor: isc.HLayout,
     width: "100%",
     height: 20
   },
@@ -115,7 +134,10 @@ isc.defineClass("DocumentContents", isc.VLayout).addProperties({
   initWidget : function () {
     this.Super("initWidget");
     this.addAutoChild("documentFlow");
+    this.addAutoChild("lowerPane");
     this.addAutoChild("documentDownload");
+    this.addAutoChild("showTagsButton");
+    this.observe(this.showTagsButton, "action", "observer.markForRedraw()");
   },
 
   setDocument : function (doc) {
@@ -298,12 +320,6 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
     width: "100%"
   },
 
-  styledTEIDefaults: {
-    _constructor: isc.DocumentStyled,
-    height: "100%",
-    width: "100%"
-  },
-
   documentTabsDefaults: {
     _constructor: isc.TabSet,
     showResizeBar: true,
@@ -312,9 +328,6 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
     tabs: [{
       title: "TEI",
       pane: "autoChild:documentContents"
-    },{
-      title: "Text",
-      pane: "autoChild:styledTEI"
     }]
   },
 
@@ -329,11 +342,18 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
     this.addAutoChild("documentLayout");
     this.addAutoChild("documentTabs");
     this.addAutoChild("deepZoom");
+    this.cssRules = isc.CSSRules.create();
+    this.showTags(false);
+  },
+
+  showTags : function (show) {
+    this.cssRules.setRule("div.tagOpen, div.tagClose, div.tagOpenClose", {
+        display: show ? "inline" : "none"
+    });
   },
 
   setDocument : function (doc) {
     this.documentContents.setDocument(doc);
-    this.styledTEI.setDocument(doc);
     this.deepZoom.setDocument(doc);
   }
 });

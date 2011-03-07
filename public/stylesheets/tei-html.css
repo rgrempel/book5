@@ -1,7 +1,6 @@
 /* Modified for HTML divs, with classes representing the TEI tags */
 
 div.tagOpen, div.tagClose, div.tagOpenClose {
-    display: inline;
     color: green;
     font-size: 90%;
 }
@@ -796,6 +795,7 @@ div.p {
 
 div.pb {
     display: block;
+    margin-top: 0.25em;
 }
 
 div.pb:after {

@@ -8,7 +8,25 @@
                 version="1.0">
   
     <xsl:output omit-xml-declaration="yes" method="html" encoding="UTF-8" version="1.0" indent="yes" />
-
+    
+    <xsl:template match="tei:facsimile">
+        <div class="tagOpen">
+            <xsl:text disable-output-escaping="yes">&amp;lt;</xsl:text>
+            <xsl:value-of select="local-name(.)" />
+            <xsl:apply-templates select="@*" mode="source" />
+            <xsl:text disable-output-escaping="yes">&amp;gt;</xsl:text>
+            <xsl:text disable-output-escaping="yes">
+                &amp;lt;!-- Omitting the facsimile ... download the
+                TEI document to see it --&amp;gt;
+            </xsl:text>
+        </div>
+        <div class="tagClose">
+            <xsl:text disable-output-escaping="yes">&amp;lt;/</xsl:text>
+            <xsl:value-of select="local-name(.)" />
+            <xsl:text disable-output-escaping="yes">&amp;gt;</xsl:text>
+        </div>
+    </xsl:template>  
+    
     <!-- By default, we just copy and descend -->
     <xsl:template name="copy-and-descend" match="*">
         <!-- Construct a div with a class of our tag name -->
