@@ -103,7 +103,45 @@ isc.defineClass("DocumentContents", isc.VLayout).addProperties({
   documentFlowDefaults: {
     _constructor: isc.HTMLPane,
     width: "100%",
-    height: "100%"
+    height: "100%",
+    handlingSync: false,
+
+    showContextMenu : function() {
+      var self = this;
+      var menuItems = [];
+
+      var pb = isc.EH.findTarget('preceding::div[@class="pb"]');
+      if (pb) {
+        var title = "Sync Image";
+        menuItems.add({
+          title: title,
+          action: function() {
+            self.handlingSync = true;
+            self.scrollToPageBreak(pb);
+            self.handlingSync = false;
+          }
+        });
+      }
+
+      if (menuItems.getLength() > 0) {
+        var menu = isc.Menu.create({
+          data: menuItems
+        });
+        menu.showContextMenu();
+        return false;
+      } else {
+        return true;
+      }
+    },
+
+    scrollToPageBreak : function (pb) {
+      var facs = pb.getAttribute("facs");
+      if (!facs) return; 
+      var surface = isc.Element.get(facs.substring(1));
+      if (!surface) return;
+      var nodes = isc.XMLTools.selectNodes(surface, 'preceding-sibling::div[@class="surface"]');
+      book5.fireScrollToSurfaceNumber(nodes.getLength());
+    }
   },
 
   documentDownloadDefaults: {
@@ -147,11 +185,10 @@ isc.defineClass("DocumentContents", isc.VLayout).addProperties({
   },
 
   handleScrollToSurface : function (surface) {
+    if (this.documentFlow.handlingSync) return;
     var nodes = this.documentFlow.selectNodes('//div[@class="pb"][@facs="#' + surface.id + '"]');
     if (nodes[0]) {
       this.documentFlow.scrollToElement(nodes[0]);
-    } else {
-      console.log("Huh? No nodes!");
     }
   },
 
@@ -247,6 +284,10 @@ isc.defineClass("SurfaceGrid", isc.ListGrid).addClassProperties({
     }
   },
 
+  handleScrollToSurfaceNumber : function (num) {
+    this.selectSingleRecord(num);
+  },
+
   handleScrollToSurface : function (surface) {
     if (this.handlingSurfaceChange) return;
     if (!this.isDrawn()) {
@@ -307,11 +348,16 @@ isc.defineClass("DeepZoomLayout", isc.HLayout).addProperties({
   draw : function () {
     var retval = this.Super("draw", arguments);
     this.observe(book5, "fireScrollToSurface", "observer.handleScrollToSurface(returnVal)");
+    this.observe(book5, "fireScrollToSurfaceNumber", "observer.handleScrollToSurfaceNumber(returnVal)");
     return retval;
   },
 
   handleImageScrolled : function (bounds) {
     this.slider.setPercentRect(bounds);
+  },
+
+  handleScrollToSurfaceNumber : function (num) {
+    this.slider.handleScrollToSurfaceNumber(num);
   },
 
   handleScrollToSurface : function (surface) {
@@ -358,6 +404,7 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
     this.addAutoChild("documentLayout");
     this.addAutoChild("documentTabs");
     this.addAutoChild("deepZoom");
+
     this.cssRules = isc.CSSRules.create();
     this.showTags(false);
   },
@@ -366,6 +413,10 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
     this.cssRules.setRule("div.tagOpen, div.tagClose, div.tagOpenClose", {
         display: show ? "inline" : "none"
     });
+  },
+
+  fireScrollToSurfaceNumber : function (num) {
+    return num;
   },
 
   fireScrollToSurface : function (surface) {
