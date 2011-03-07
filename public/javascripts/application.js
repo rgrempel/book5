@@ -93,7 +93,7 @@ isc.defineClass("DocumentLayout", isc.VLayout).addProperties({
   },
 
   initWidget : function () {
-    this.Super("initWidget");
+    this.Super("initWidget", arguments);
     this.addAutoChild("documentGrid");
     this.addAutoChild("uploadForm");
   }
@@ -132,12 +132,27 @@ isc.defineClass("DocumentContents", isc.VLayout).addProperties({
   },
 
   initWidget : function () {
-    this.Super("initWidget");
+    this.Super("initWidget", arguments);
     this.addAutoChild("documentFlow");
     this.addAutoChild("lowerPane");
     this.addAutoChild("documentDownload");
     this.addAutoChild("showTagsButton");
     this.observe(this.showTagsButton, "action", "observer.markForRedraw()");
+  },
+
+  draw : function () {
+    retval = this.Super("draw", arguments);
+    this.observe(book5, "fireScrollToSurface", "observer.handleScrollToSurface(returnVal)");
+    return retval;
+  },
+
+  handleScrollToSurface : function (surface) {
+    var nodes = this.documentFlow.selectNodes('//div[@class="pb"][@facs="#' + surface.id + '"]');
+    if (nodes[0]) {
+      this.documentFlow.scrollToElement(nodes[0]);
+    } else {
+      console.log("Huh? No nodes!");
+    }
   },
 
   setDocument : function (doc) {
@@ -228,12 +243,8 @@ isc.defineClass("SurfaceGrid", isc.ListGrid).addClassProperties({
 
   selectionChanged : function (record, state) {
     if (state) {
-      if (!this.handlingSurfaceChange) this.fireScrollToSurface(record);
+      if (!this.handlingSurfaceChange) book5.fireScrollToSurface(record);
     }
-  },
-
-  fireScrollToSurface : function (surface) {
-    return surface;
   },
 
   handleScrollToSurface : function (surface) {
@@ -285,13 +296,18 @@ isc.defineClass("DeepZoomLayout", isc.HLayout).addProperties({
   },
 
   initWidget : function () {
-    this.Super("initWidget");
+    this.Super("initWidget", arguments);
 
     this.addAutoChild("image");
     this.addAutoChild("slider");
 
     this.observe(this.image, "fireVisible", "observer.handleImageScrolled(returnVal)");
-    this.observe(this.slider, "fireScrollToSurface", "observer.handleScrollToSurface(returnVal)");
+  },
+
+  draw : function () {
+    var retval = this.Super("draw", arguments);
+    this.observe(book5, "fireScrollToSurface", "observer.handleScrollToSurface(returnVal)");
+    return retval;
   },
 
   handleImageScrolled : function (bounds) {
@@ -338,7 +354,7 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
   },
 
   initWidget : function () {
-    this.Super("initWidget");
+    this.Super("initWidget", arguments);
     this.addAutoChild("documentLayout");
     this.addAutoChild("documentTabs");
     this.addAutoChild("deepZoom");
@@ -350,6 +366,10 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
     this.cssRules.setRule("div.tagOpen, div.tagClose, div.tagOpenClose", {
         display: show ? "inline" : "none"
     });
+  },
+
+  fireScrollToSurface : function (surface) {
+    return surface;
   },
 
   setDocument : function (doc) {

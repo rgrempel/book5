@@ -74,7 +74,6 @@
     <!-- Except for xml:id, which we do as id -->
     <xsl:template match="@xml:id">
         <xsl:attribute name="id">
-            <xsl:text>tei-tags-</xsl:text>
             <xsl:value-of select="." />
         </xsl:attribute>
     </xsl:template>
