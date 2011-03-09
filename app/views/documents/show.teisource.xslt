@@ -19,7 +19,7 @@
                  should go inside or outside our real markup ... probably inside -->
             <xsl:choose>
                 <!-- If we have no children, then output a self-closing tag -->
-                <xsl:when test="count(* | text()) = 0">
+                <xsl:when test="count(* | text() | comment()) = 0">
                     <div class="tagOpenClose">
                         <xsl:text disable-output-escaping="yes">&amp;lt;</xsl:text>
                         <xsl:value-of select="local-name(.)" />
@@ -47,7 +47,16 @@
             </xsl:choose>
         </div>
     </xsl:template>
-    
+   
+    <!-- Output comments -->
+    <xsl:template match="comment()">
+        <div class="tagComment">
+            <xsl:text disable-output-escaping="yes">&amp;lt;!-- </xsl:text>
+            <xsl:value-of select="." />
+            <xsl:text disable-output-escaping="yes"> --/&amp;gt;</xsl:text>
+        </div> 
+    </xsl:template>
+
     <!-- For attributes and text, we just copy -->
     <xsl:template match="text() | @*">
         <xsl:copy />

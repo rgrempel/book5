@@ -411,7 +411,10 @@ isc.defineClass("AppLayout", isc.HLayout).addProperties({
 
   showTags : function (show) {
     this.cssRules.setRule("div.tagOpen, div.tagClose, div.tagOpenClose", {
-        display: show ? "inline" : "none"
+      display: show ? "inline" : "none"
+    });
+    this.cssRules.setRule("div.tagComment", {
+      display: show ? "block" : "none"
     });
   },
 

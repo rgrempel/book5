@@ -19,6 +19,22 @@ div.tagAttribute {
     color: green;
 }
 
+div.tagComment {
+    margin-left: 2em;
+    margin-right: 2em;
+    color: #331111;
+    font-size: 90%;
+    padding: 1px;
+    background-color: #FFEEEE;
+    border: 1px solid #886666;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -opera-border-radius: 8px;
+    -khtml-border-radius: 8px;
+    border-radius: 8px;
+    opacity: 0.8;
+}
+
 div.facsimile:after {
     content: "<surface> tags omitted ... download TEI document to see them";
     color: blue;
