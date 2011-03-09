@@ -67,7 +67,14 @@ div.w div.lb:before {
     font-weight: bold;
 }
 
-div.w div.lb {
+div.w div.pb:before {
+    content: "//";
+    color: blue;
+    display: inline;
+    font-weight: bold;
+}
+
+div.w div.lb, div.w div.pb {
     display: inline;
 }
 
