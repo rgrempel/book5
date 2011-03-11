@@ -77,8 +77,14 @@ isc.defineClass("DocumentGrid", isc.ListGrid).addProperties({
   autoFetchData: true,
   showAllRecords: false,
   selectionType: "single",
+  sortField: "created_at",
+  sortDirection: "descending",
 
-  recordClick : function (viewer, record, recordNum, field, fieldNum, value, rawValue) {
+  dataArrived: function (startRow, endRow) {
+    if (!this.anySelected()) this.selectSingleRecord(startRow);
+  },
+
+  selectionUpdated : function (record) {
     book5.setDocument(record);
   }
 });
