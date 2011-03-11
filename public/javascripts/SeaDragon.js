@@ -1,4 +1,5 @@
 Seadragon.Config.imagePath = '/javascripts/seadragon-img/';
+Seadragon.Config.maxZoomPixelRatio = 4; 
 
 isc.defineClass("SeaDragon","Canvas").addProperties({
   dzi_url: null,
