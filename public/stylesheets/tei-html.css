@@ -14,6 +14,13 @@ div.tagOpen, div.tagClose, div.tagOpenClose {
     opacity: 0.8;
 }
 
+/* Make the <w> tags very small ... */
+div.w > div.tagOpen, div.w > div.tagClose {
+    font-size: 50%;
+    border: 0px solid;
+    background-color: transparent;
+}
+
 div.tagAttribute {
     display: inline;
     color: green;
