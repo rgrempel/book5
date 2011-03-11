@@ -113,6 +113,7 @@ isc.defineClass("DocumentContents", isc.VLayout).addProperties({
     width: "100%",
     height: "100%",
     handlingSync: false,
+    styleName: "documentFlow",
 
     showContextMenu : function() {
       var self = this;

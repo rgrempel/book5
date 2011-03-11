@@ -1,5 +1,10 @@
 /* Modified for HTML divs, with classes representing the TEI tags */
 
+.documentFlow {
+    font-size: 125%;
+    line-height: 135%;
+}
+
 div.tagOpen, div.tagClose, div.tagOpenClose {
     color: #113311;
     font-size: 90%;
@@ -40,6 +45,76 @@ div.tagComment {
     -khtml-border-radius: 8px;
     border-radius: 8px;
     opacity: 0.8;
+}
+
+div.correction:before {
+    content: "Correction";
+    font-weight: bold;
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+div.normalization:before {
+    content: "Normalization";
+    font-weight: bold;
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+div.hyphenation:before {
+    content: "Hyphenation";
+    font-weight: bold;
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+div.segmentation:before {
+    content: "Segmentation";
+    font-weight: bold;
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+div.refsDecl:before {
+    content: "Reference Scheme";
+    font-weight: bold;
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+div.tagsDecl:before {
+    content: "Tags";
+    font-weight: bold;
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+div.rendition:before {
+    content: "Rendition (" attr(id) "): ";
+    display: inline;
+}
+
+div.tagUsage:before {
+    content: "<" attr(gi) ">";
+    font-weight: bold;
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+div.tagUsage {
+    margin-left: 1em;
+}
+
+div.val {
+    display: inline;
+    color: blue;
 }
 
 div.facsimile:after {
@@ -210,8 +285,6 @@ div.body {
     margin-left: 3em;
     display: block;
     counter-reset: div1;
-    font-size: 125%;
-    line-height: 135%;
 }
 
 div.byline {
@@ -242,10 +315,16 @@ div.cell[role='label'] {
     background-color: #BBBBBB;
 }
 
+div.change:before {
+    content: attr(when) " " attr(who);
+    display: block;
+    text-decoration: underline;
+}
+
 div.change {
     display: block;
     margin-bottom: 1em;
-    margin-left: 2em;
+    margin-left: 1em;
 }
 
 div.cit {
@@ -416,6 +495,10 @@ div.editionStmt {
 div.editor {
     display: block;
     margin-bottom: 0.5em;
+}
+
+div.editor:before {
+    content: "Editor: "
 }
 
 div.bibl div.editor {
@@ -691,6 +774,7 @@ div.list div.item {
 
 div.item {
     display: list-item;
+    margin-top: 0.5em;
     margin-left: 12pt;
 }
 
@@ -704,13 +788,6 @@ div.item[n]:before {
   And should default marker be suppressed
   when there is an @n attribute? --DRS
  */
-
-div.change div.item {
-    display: block;
-    margin-bottom: 0.5em;
-    margin-left: 1em;
-    margin-top: 0.5em;
-}
 
 div.keywords {
     display: block;
@@ -762,9 +839,9 @@ div.list {
     display: block;
     list-style-type: disc;
     list-style-position: outside;
-    margin-bottom: 1em;
-    margin-left: 2em;
-    margin-top: 1em;
+    margin-bottom: 0.5em;
+    margin-left: 1em;
+    margin-top: 0.5em;
 }
 
 div.list[rend="runon"] {
@@ -969,6 +1046,7 @@ div.resp {
 
 div.respStmt {
     display: block;
+    margin-top: 0.5em;
 }
 
 div.bibl div.respStmt {
@@ -1127,8 +1205,15 @@ div.titlePart {
     display: block;
 }
 
-div.titleStmt {
+div.titleStmt div.title {
     font-size: large;
+    font-weight: bold;
+    margin-bottom: 1em;
+    text-align: center;
+}
+
+div.titleStmt {
+    font-size: normal;
     font-weight: bold;
     margin-bottom: 1em;
     text-align: center;
@@ -1187,6 +1272,14 @@ div.sourceDesc {
     padding-left: 1em;
     padding-right: 1em;
     padding-bottom: 1em;
+}
+
+div.revisionDesc:before {
+    content: "Revisions";
+    font-weight: bold;
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
 }
 
 div.revisionDesc {
