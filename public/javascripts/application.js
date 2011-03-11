@@ -119,7 +119,7 @@ isc.defineClass("DocumentContents", isc.VLayout).addProperties({
       var self = this;
       var menuItems = [];
 
-      var pb = isc.EH.findTarget('preceding::div[@class="pb"]');
+      var pb = isc.EH.findTarget('(preceding::div[@class="pb"])[position()=last()]');
       if (pb) {
         var title = "Sync Image";
         menuItems.add({
