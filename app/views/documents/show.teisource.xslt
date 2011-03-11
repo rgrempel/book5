@@ -77,6 +77,15 @@
         </xsl:attribute>
     </xsl:template>
 
+    <!-- For rendition, get the rendition element -->
+    <!-- TODO: Deal with multiple values, which are legal -->
+    <xsl:template match="@rendition">
+        <xsl:copy />
+        <xsl:attribute name="style">
+            <xsl:value-of select="id(substring(., 2))" />
+        </xsl:attribute>
+    </xsl:template>
+
     <!-- And for source, we do something different -->
     <xsl:template match="@*" mode="source">
         <div class="tagAttribute">
