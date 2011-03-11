@@ -257,6 +257,10 @@ isc.defineClass("SurfaceGrid", isc.ListGrid).addClassProperties({
     this.fetchData({document_id: doc.id});
   },
 
+  dataArrived : function (startRow, endRow) {
+    if (!this.anySelected()) this.selectSingleRecord(startRow);
+  },
+
   setPercentRect : function (percentRect) {
     var thumbWidth = this.getClass().thumbWidth;
     var thumbHeight = this.getClass().thumbHeight;
