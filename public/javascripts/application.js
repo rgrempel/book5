@@ -82,10 +82,12 @@ isc.defineClass("DocumentGrid", isc.ListGrid).addProperties({
 
   dataArrived: function (startRow, endRow) {
     if (!this.anySelected()) this.selectSingleRecord(startRow);
+    return this.Super("dataArrived", arguments);
   },
 
-  selectionUpdated : function (record) {
-    book5.setDocument(record);
+  selectionChanged : function (record, state) {
+    if (state) book5.setDocument(record);
+    return this.Super("selectionChanged", arguments);
   }
 });
 
@@ -259,6 +261,7 @@ isc.defineClass("SurfaceGrid", isc.ListGrid).addClassProperties({
 
   dataArrived : function (startRow, endRow) {
     if (!this.anySelected()) this.selectSingleRecord(startRow);
+    return this.Super("dataArrived", arguments);
   },
 
   setPercentRect : function (percentRect) {
