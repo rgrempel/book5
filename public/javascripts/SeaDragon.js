@@ -1,3 +1,5 @@
+Seadragon.Config.imagePath = '/javascripts/seadragon-img/';
+
 isc.defineClass("SeaDragon","Canvas").addProperties({
   dzi_url: null,
   viewer: null,
