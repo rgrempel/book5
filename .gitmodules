@@ -1,3 +1,6 @@
 [submodule "public/javascripts/isomorphic"]
 	path = public/javascripts/isomorphic
 	url = git://github.com/rgrempel/isomorphic.git
+[submodule "lib/deepzoom.rb"]
+	path = lib/deepzoom.rb
+	url = git://github.com/openzoom/deepzoom.rb
