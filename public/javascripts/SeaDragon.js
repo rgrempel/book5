@@ -113,7 +113,12 @@ isc.defineClass("SeaDragon", "Canvas").addProperties({
     menuItems.add({
       title: "Create Overlay",
       action : function () {
-        self.addOverlay(isc.SeaDragonOverlay.create());
+        var pixels = new Seadragon.Point(self.getOffsetX(), self.getOffsetY());
+        var point = self.viewer.viewport.pointFromPixel(pixels, true);
+        var size = self.viewer.viewport.deltaPointsFromPixels(new Seadragon.Point(60, 60));
+        self.addOverlay(isc.SeaDragonOverlay.create({
+          rect: new Seadragon.Rect(point.x, point.y, size.x, size.y)
+        }));
       }
     });
 
