@@ -15,11 +15,22 @@ isc.defineClass("SeaDragonOverlay").addProperties({
       this.element.style.border = "2px solid white";
       this.element.style.backgroundColor = "#666666";
       this.element.style.opacity = "0.4";
+
+      this.message = document.createElement("div");
+      this.message.style.position = "absolute";
+      this.message.style.left = "2px";
+      this.message.style.top = "2px";
+      this.message.style.fontSize = "16px";
+      this.message.style.color = "blue";
+      
+      this.element.appendChild(this.message);
     }
     
     if (!this.rect) {
       this.rect = new Seadragon.Rect(0.15, 0.11, 0.14, 0.07);
     }
+
+    this.updateMessage();
 
     this.element.setAttribute("seaDragonOverlay", this.getID());
 
@@ -35,6 +46,17 @@ isc.defineClass("SeaDragonOverlay").addProperties({
     return ret;
   },
 
+  updateMessage : function () {
+    var ulx = Math.round(this.rect.x * 2800);
+    var uly = Math.round(this.rect.y * 2800);
+    var lrx = Math.round((this.rect.x + this.rect.width) * 2800);
+    var lry = Math.round((this.rect.y + this.rect.height) * 2800);
+    this.message.innerHTML = '&lt;zone ulx="' + String(ulx) +
+                                      '" uly="' + String(uly) +
+                                      '" lrx="' + String(lrx) +
+                                      '" lry="' + String(lry) + '"&gt;';
+  },
+
   handleDrag : function (position, delta, shift) {
     var dragDelta = position.minus(this._dragStartPosition);
     var pointDelta = this.seaDragon.deltaPointsFromPixels(dragDelta, true);
@@ -42,6 +64,7 @@ isc.defineClass("SeaDragonOverlay").addProperties({
     this.rect.x = this.rect.x + pointDelta.x;
     this.rect.y = this.rect.y + pointDelta.y;
     this.seaDragon.updateOverlay(this);
+    this.updateMessage();
   },
 
   handlePress : function (position) {
