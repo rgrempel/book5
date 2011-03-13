@@ -3,4 +3,5 @@ db/*.sqlite3
 log/*.log
 tmp/
 public/s3
+public/hires
 public/system
