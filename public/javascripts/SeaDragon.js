@@ -1,5 +1,5 @@
 Seadragon.Config.imagePath = '/javascripts/seadragon-img/';
-Seadragon.Config.maxZoomPixelRatio = 4; 
+Seadragon.Config.maxZoomPixelRatio = 2; 
 
 isc.defineClass("SeaDragonOverlay").addProperties({
   element: null,
