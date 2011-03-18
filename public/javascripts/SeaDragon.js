@@ -63,38 +63,52 @@ isc.defineClass("SeaDragonOverlay").addProperties({
 
     // Deal with x
     if (this.resizingLeft) {
-      this.rect.x = this._dragStartRect.x + pointDelta.x;
-      this.rect.width = this._dragStartRect.width - pointDelta.x;
+      pointDelta.x = Math.min(pointDelta.x, this._dragStartRect.width - 2); 
+      this.element.style.left = String(this._dragStartRect.x + pointDelta.x) + "px";
+      this.element.style.width = String(this._dragStartRect.width - pointDelta.x) + "px";
     } else if (this.resizingRight) {
-      this.rect.width = this._dragStartRect.width + pointDelta.x;
+      pointDelta.x = Math.max(pointDelta.x, -this._dragStartRect.width + 2);
+      this.element.style.width = this._dragStartRect.width + pointDelta.x;
     } else if (!this.resizingUp && !this.resizingDown) {
-      this.rect.x = this._dragStartRect.x + pointDelta.x;
+      this.element.style.left = String(this._dragStartRect.x + pointDelta.x) + "px";
     }
 
     // And y
     if (this.resizingUp) {
-      this.rect.y = this._dragStartRect.y + pointDelta.y;
-      this.rect.height = this._dragStartRect.height - pointDelta.y;
+      pointDelta.y = Math.min(pointDelta.y, this._dragStartRect.height - 2);
+      this.element.style.top = String(this._dragStartRect.y + pointDelta.y) + "px";
+      this.element.style.height = String(this._dragStartRect.height - pointDelta.y) + "px";
     } else if (this.resizingDown) {
-      this.rect.height = this._dragStartRect.height + pointDelta.y;
+      pointDelta.y = Math.max(pointDelta.y, -this._dragStartRect.width + 2);
+      this.element.style.height = String(this._dragStartRect.height + pointDelta.y) + "px";
     } else if (!this.resizingLeft && !this.resizingRight) {    
-      this.rect.y = this._dragStartRect.y + pointDelta.y;
+      this.element.style.top = String(this._dragStartRect.y + pointDelta.y) + "px";
     }
     
-    this.seaDragon.updateOverlay(this);
+    var pixels = this.getPixelRect();
+    var position = this.seaDragon.pointFromPixel(new Seadragon.Point(pixels.x, pixels.y));
+    var size = this.seaDragon.deltaPointsFromPixels(new Seadragon.Point(pixels.width, pixels.height));
+    this.rect = new Seadragon.Rect(position.x, position.y, size.x, size.y);
     this.updateMessage();
   },
 
   pointFromPosition : function (position) {
-    var realPosition = position.plus(this.seaDragon.pixelFromPoint(new Seadragon.Point(this.rect.x, this.rect.y), true));
-    return this.seaDragon.pointFromPixel(realPosition);
+    var rect = this.getPixelRect();
+    return new Seadragon.Point(rect.x, rect.y).plus(position);
+  },
+
+  getPixelRect : function () {
+    return new Seadragon.Rect(parseInt(this.element.style.left), 
+                              parseInt(this.element.style.top), 
+                              parseInt(this.element.style.width),
+                              parseInt(this.element.style.height));
   },
 
   handlePress : function (position) {
-    this._dragStartRect = new Seadragon.Rect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
+    this._dragStartRect = this.getPixelRect(); 
     this._dragStartPoint = this.pointFromPosition(position);
     
-    var rectSize = this.seaDragon.deltaPixelsFromPoints(new Seadragon.Point(this.rect.width, this.rect.height), true); 
+    var rectSize = Seadragon.Utils.getElementSize(this.element);
     var tolerance = 4;
 
     // Figure out which way we should resize, or if we're moving
@@ -131,6 +145,7 @@ isc.defineClass("SeaDragonOverlay").addProperties({
   },
 
   handleRelease : function (insideElementPress, insideElementRelease) {
+    this.seaDragon.updateOverlay(this);
     this.seaDragon.setTracking(true);
     this.seaDragon.setCursor("auto");
   }
