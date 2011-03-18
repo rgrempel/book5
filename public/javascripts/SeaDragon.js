@@ -18,10 +18,11 @@ isc.defineClass("SeaDragonOverlay").addProperties({
 
       this.message = document.createElement("div");
       this.message.style.position = "absolute";
-      this.message.style.left = "2px";
-      this.message.style.top = "2px";
+      this.message.style.left = "0px";
+      this.message.style.top = "0px";
+      this.message.style.padding = "2px";
       this.message.style.fontSize = "16px";
-      this.message.style.color = "blue";
+      this.message.style.backgroundColor = "#AAAAAA";
       
       this.element.appendChild(this.message);
     }
@@ -58,24 +59,80 @@ isc.defineClass("SeaDragonOverlay").addProperties({
   },
 
   handleDrag : function (position, delta, shift) {
-    var dragDelta = position.minus(this._dragStartPosition);
-    var pointDelta = this.seaDragon.deltaPointsFromPixels(dragDelta, true);
+    var pointDelta = this.pointFromPosition(position).minus(this._dragStartPoint);
 
-    this.rect.x = this.rect.x + pointDelta.x;
-    this.rect.y = this.rect.y + pointDelta.y;
+    // Deal with x
+    if (this.resizingLeft) {
+      this.rect.x = this._dragStartRect.x + pointDelta.x;
+      this.rect.width = this._dragStartRect.width - pointDelta.x;
+    } else if (this.resizingRight) {
+      this.rect.width = this._dragStartRect.width + pointDelta.x;
+    } else if (!this.resizingUp && !this.resizingDown) {
+      this.rect.x = this._dragStartRect.x + pointDelta.x;
+    }
+
+    // And y
+    if (this.resizingUp) {
+      this.rect.y = this._dragStartRect.y + pointDelta.y;
+      this.rect.height = this._dragStartRect.height - pointDelta.y;
+    } else if (this.resizingDown) {
+      this.rect.height = this._dragStartRect.height + pointDelta.y;
+    } else if (!this.resizingLeft && !this.resizingRight) {    
+      this.rect.y = this._dragStartRect.y + pointDelta.y;
+    }
+    
     this.seaDragon.updateOverlay(this);
     this.updateMessage();
   },
 
+  pointFromPosition : function (position) {
+    var realPosition = position.plus(this.seaDragon.pixelFromPoint(new Seadragon.Point(this.rect.x, this.rect.y), true));
+    return this.seaDragon.pointFromPixel(realPosition);
+  },
+
   handlePress : function (position) {
     this._dragStartRect = new Seadragon.Rect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
-    this._dragStartPosition = position;
-  
+    this._dragStartPoint = this.pointFromPosition(position);
+    
+    var rectSize = this.seaDragon.deltaPixelsFromPoints(new Seadragon.Point(this.rect.width, this.rect.height), true); 
+    var tolerance = 4;
+
+    // Figure out which way we should resize, or if we're moving
+    this.resizingLeft = position.x < tolerance;
+    this.resizingUp = position.y < tolerance;
+    this.resizingRight = (rectSize.x - position.x) < tolerance;
+    this.resizingDown = (rectSize.y - position.y) < tolerance;
+
+    var cursor = "auto";
+    if (this.resizingLeft) {
+      if (this.resizingUp) {
+        cursor = "nw-resize";
+      } else if (this.resizingDown) {
+        cursor = "sw-resize";
+      } else {
+        cursor = "w-resize";
+      }
+    } else if (this.resizingRight) {
+      if (this.resizingUp) {
+        cursor = "ne-resize";
+      } else if (this.resizingDown) {
+        cursor = "se-resize";
+      } else {
+        cursor = "e-resize";
+      }
+    } else if (this.resizingUp) {
+      cursor = "n-resize";
+    } else if (this.resizingDown) {
+      cursor = "s-resize";
+    }
+
+    this.seaDragon.setCursor(cursor);
     this.seaDragon.setTracking(false);
   },
 
   handleRelease : function (insideElementPress, insideElementRelease) {
     this.seaDragon.setTracking(true);
+    this.seaDragon.setCursor("auto");
   }
 }).addClassMethods({
   dragHandler : function (tracker, position, delta, shift) {
@@ -115,6 +172,10 @@ isc.defineClass("SeaDragon", "Canvas").addProperties({
     this.closeDZI();
     this.viewer = null;
     this.Super("clear", arguments);
+  },
+
+  setCursor : function (cursor) {
+    this.getHandle().style.cursor = cursor;
   },
 
   handleVisible : function (viewer) {
@@ -189,6 +250,18 @@ isc.defineClass("SeaDragon", "Canvas").addProperties({
 
   deltaPointsFromPixels : function (pixels, current) {
     return this.viewer.viewport.deltaPointsFromPixels(pixels, current);
+  },
+
+  pointFromPixel : function (pixels, current) {
+    return this.viewer.viewport.pointFromPixel(pixels, current);
+  },
+
+  deltaPixelsFromPoints : function (points, current) {
+    return this.viewer.viewport.deltaPixelsFromPoints(points, current);
+  },
+
+  pixelFromPoint : function (point, current) {
+    return this.viewer.viewport.pixelFromPoint(point, current);
   },
 
   setTracking : function (enabled) {
